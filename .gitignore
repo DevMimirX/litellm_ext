@@ -1,0 +1,353 @@
+# =========================================
+# Python: bytecode, C-extensions, builds
+# =========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.pyd
+*.pyo
+
+# Distribution / packaging
+.Python
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheelhouse/
+share/python-wheels/
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.envrc
+.python-version   # pyenv
+
+# Local agent CLI config overrides
+config/claude.settings.json
+
+
+# =========================================
+# Notebooks & interactive tooling
+# =========================================
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints/
+.profile_default/
+.ipython/
+.jupyter/
+.lab/
+
+# IPython history
+.history
+
+
+# =========================================
+# Testing, coverage, tooling caches
+# =========================================
+
+# pytest
+.pytest_cache/
+test-results/
+
+# tox / nox
+.tox/
+.nox/
+
+# Hypothesis
+.hypothesis/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Nose
+nosetests.xml
+
+# Generic caches
+.cache/
+
+# Type checkers & linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.pyright/
+.ruff_cache/
+
+
+# =========================================
+# Security / static analysis
+# =========================================
+
+.bandit/
+
+
+# =========================================
+# Framework / app-specific (Django/Flask/etc.)
+# =========================================
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+
+# =========================================
+# Docs
+# =========================================
+
+docs/_build/
+site/              # mkdocs or similar built docs
+
+
+# =========================================
+# Editors & IDEs
+# =========================================
+
+# PyCharm / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Spyder
+.spyproject/
+
+# Rope
+.ropeproject/
+
+
+# =========================================
+# OS cruft
+# =========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# =========================================
+# Logs, artifacts, temporary files
+# =========================================
+
+*.log
+*.out
+*.err
+logs/
+tmp/
+tmp-*/
+.temp/
+.temp-*/
+**/*.tmp
+
+# Editor temp files
+*.swp
+*.swo
+*~
+.#*
+.emacs.desktop
+.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+
+
+# =========================================
+# Node / frontend (if present)
+# =========================================
+
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+
+# =========================================
+# Data files (global ignores for heavy formats)
+# =========================================
+
+# Columnar / binary
+*.parquet
+*.parq
+*.pq
+*.feather
+*.arrow
+*.orc
+*.avro
+*.ipc
+
+# Delimited / row-oriented
+*.csv
+*.tsv
+*.csv.gz
+*.csv.bz2
+*.csv.xz
+*.csv.zip
+*.tsv.gz
+*.tsv.bz2
+*.tsv.xz
+*.psv
+
+# JSON lines & compressed JSON
+*.jsonl
+*.ndjson
+*.json.gz
+*.json.bz2
+*.json.xz
+
+# Spreadsheets
+*.xlsx
+*.xls
+*.xlsb
+*.xlsm
+*.ods
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+*.mdb
+*.accdb
+
+# Scientific / array data
+*.h5
+*.hdf
+*.hdf5
+*.he5
+*.nc
+*.nc4
+*.mat
+*.npz
+*.npy
+*.zarr/
+
+# Stats / data science
+*.sav        # SPSS
+*.sas7bdat   # SAS
+*.dta        # Stata
+*.rds
+*.rdata
+*.fst
+
+# Model & cache artifacts
+*.pkl
+*.pickle
+*.joblib
+*.dill
+
+# Compressed archives (often data dumps)
+*.zip
+*.gz
+*.bz2
+*.xz
+*.zst
+*.lz4
+*.tar
+*.tgz
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.7z
+
+# Spark / Hadoop output markers
+part-*
+_SUCCESS
+_started*
+_committed*
+_metadata
+_common_metadata
+*.crc
+
+# Delta Lake logs
+**/_delta_log/
+
+
+# =========================================
+# Project-specific data & artifacts
+# =========================================
+
+# Ignore all files in datasets (Parquet/partition trees, metadata, etc.)
+datasets/**
+
+# Allow directory structure and gitkeeps inside datasets
+!datasets/**/
+!datasets/**/.gitkeep
+
+# Keep small sample data in specific folders (unignore within these)
+!tests/**/data/**
+!tests/**/fixtures/**
+!docs/**/assets/**
+!examples/**/data/**
+!examples/**/datasets/**
+
+
+# -----------------------------------------
+# Re-ignore Python bytecode even inside data/fixtures
+# -----------------------------------------
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+
+
+# =========================================
+# ML / analytics artifacts (opt-in ignore)
+# =========================================
+
+mlruns/
+wandb/
+tensorboard/
+ray_results/
+dask-worker-space/
+.claude/
+
