@@ -1,0 +1,191 @@
+version: 1
+debug:
+  config: false
+  policy: true
+  httpx_registry: true
+  count_tokens_stub: false
+  hard_caps: true
+  hard_caps_messages: true
+  local_token_counter: true
+  streaming_sse: true
+  stream_usage_rewrite: true
+  reasoning_replay: true
+  transform: true
+extensions:
+  httpx_registry:
+    enabled: true
+  count_tokens_stub:
+    enabled: false
+    host_substr: 'api.anthropic.com'
+    target_suffixes:
+    - /v1/messages/count_tokens
+    - /messages/count_tokens
+    - /count_tokens
+  hard_caps:
+    enabled: true
+  hard_caps_messages:
+    enabled: true
+    model_patterns:
+    - "*"
+    path_suffixes:
+    - /v1/messages
+    - /anthropic/v1/messages
+  local_token_counter:
+    enabled: true
+    providers:
+    - anthropic
+    model_patterns:
+    - claude-*
+    - anthropic/claude-*
+    - anthropic-claude-*
+    - glm-*
+    - anthropic/glm-*
+    - anthropic-glm-*
+    - qwen3-*
+    - anthropic/qwen3-*
+    - anthropic-qwen3-*
+    - qwen3.5-*
+    - anthropic/qwen3.5-*
+    - anthropic-qwen3.5-*
+    - MiniMax-*
+    - anthropic/MiniMax-*
+    - anthropic-MiniMax-*
+    - kimi-*
+    - anthropic/kimi-*
+    - anthropic-kimi-*
+    - deepseek-*
+    - anthropic/deepseek-*
+    - anthropic-deepseek-*
+    - doubao-*
+    - anthropic/doubao-*
+    - anthropic-doubao-*
+    host_substrs:
+    - api.anthropic.com
+    force_anthropic_count_tokens: true
+  streaming_sse:
+    enabled: true
+  stream_usage_rewrite:
+    enabled: false
+    model_patterns:
+    - glm-*
+    - deepseek-*
+    - kimi-*
+    - qwen3-*
+    - doubao-*
+    respect_autocompact_tuning: true
+    path_suffixes:
+    - /v1/messages
+    - /anthropic/v1/messages
+  reasoning_replay:
+    enabled: false
+    model_patterns:
+    - kimi-*
+    path_suffixes:
+    - /v1/chat/completions
+    - /chat/completions
+    cache_ttl_seconds: 3600
+    cache_max_entries: 10000
+    fallback_reasoning: " "
+  transform:
+    enabled: false
+    strict_openai_compliance: true
+    openai_paths:
+    - /v1/chat/completions
+    - /chat/completions
+    anthropic_paths:
+    - /v1/messages
+    - /anthropic/v1/messages
+policy:
+  safety_buffer_tokens: 4096
+  context_estimate_multiplier: 1.0
+  overflow_policy: reduce_then_trim
+  min_tail_messages: 8
+  max_trim_steps: 400
+  skip_path_suffixes:
+  - /messages/count_tokens
+  - /v1/messages/count_tokens
+  - /count_tokens
+  compact_routing:
+    enabled: true
+    mode: explicit
+    target_model: kimi-k2.5-ali
+    explicit_patterns:
+    - <command-name>\s*/compact\s*</command-name>
+    - <command-message>\s*compact\s*</command-message>
+    - (?mi)^\s*/compact(?:\s+.*)?\s*$
+    - (?is)(?=.*detailed summary of the conversation so far)(?=.*Do NOT use any tools\.)(?=.*<summary>)
+    patterns:
+    - <command-name>\s*/compact\s*</command-name>
+    - <command-message>\s*compact\s*</command-message>
+  model_limits:
+    '*':
+      max_output: 20000
+      max_context: 180000
+    glm-4.7:
+      max_output: 20000
+      max_context: 200000
+    glm-4.7-ark:
+      max_output: 20000
+      max_context: 200000
+    glm-5:
+      max_output: 20000
+      max_context: 200000
+    glm-5-ali:
+      max_output: 20000
+      max_context: 200000
+    kimi-k2.5:
+      max_output: 20000
+      max_context: 200000
+    kimi-k2.5-ark:
+      max_output: 20000
+      max_context: 200000
+    kimi-k2.5-ali:
+      max_output: 20000
+      max_context: 200000
+    MiniMax-M2-ali:
+      max_output: 20000
+      max_context: 200000
+    deepseek-chat:
+      max_output: 8192
+      max_context: 131072
+    deepseek-reasoner:
+      max_output: 16384
+      max_context: 131072
+    qwen3.5-plus:
+      max_output: 65536
+      max_context: 262144
+    qwen3-max:
+      max_output: 65536
+      max_context: 262144
+    qwen3-coder-plus:
+      max_output: 65536
+      max_context: 1000000
+    doubao-seed-2.0-code:
+      max_output: 20000
+      max_context: 262144
+  tool_sanitizer:
+    enabled: true
+    on_invalid: convert_to_text
+  autocompact_tuning:
+    enabled: true
+    allow_underreport: false
+    default_multiplier: 1.0
+    multipliers:
+      glm-4.7: 1.0
+      glm-4.7-ark: 1.0
+      glm-5: 1.0
+      kimi-k2.5: 1.0
+      kimi-k2.5-ark: 1.0
+      qwen3-max: 1.0
+      qwen3-coder-plus: 1.0
+      doubao-seed-2.0-code: 1.0
+      deepseek-chat: 1.2
+      deepseek-reasoner: 1.2
+  model_mapping:
+    enabled: false
+    apply_to_patterns:
+    - claude-*
+    reasoning_model: ""
+    default_model: ""
+    family_overrides: {}
+    match_substrings: true
