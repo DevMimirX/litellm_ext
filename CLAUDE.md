@@ -12,7 +12,9 @@ source .venv/bin/activate                   # Activate environment
 # Testing
 uv run pytest                                # Run all tests
 uv run pytest tests/test_file.py              # Run specific test file
+uv run pytest tests/test_file.py::test_name   # Run specific test function
 uv run pytest -v                              # Verbose output
+uv run pytest -x                              # Stop on first failure
 
 # Linting and type checking
 uv run ruff check .                          # Ruff linting
@@ -60,18 +62,28 @@ Key principles:
 ```
 litellm_ext/
 ├── bootstrap.py           # Entry point: install_extensions()
-├── sitecustomize.py       # Auto-loaded on PYTHONPATH
 ├── core/                  # Patching infrastructure
 │   ├── registry.py        # HTTPX mutator registry (priority-ordered)
 │   ├── config.py          # YAML config loader with hot-reload
-│   └── settings.py        # PatchSettings dataclass
+│   ├── patch.py           # PatchSettings dataclass
+│   ├── model_alias.py     # Model alias resolution and caching
+│   └── logging.py         # Shared logging utilities
 ├── extensions/            # Modular extensions (installed by priority)
 │   ├── __init__.py        # Extension install ordering
 │   ├── httpx/             # Request/response mutators
 │   ├── asgi/              # Middleware patches
-│   └── litellm/           # Direct LiteLLM patches
+│   ├── litellm/           # Direct LiteLLM patches
+│   └── suppress_warnings.py
 ├── policy/                # Token estimation and message trimming
-└── adapters/              # Schema conversion (Anthropic <-> OpenAI)
+│   ├── engine.py          # Core policy logic
+│   ├── settings.py        # Policy settings from config
+│   └── text.py            # Message normalization utilities
+├── adapters/              # Schema conversion (Anthropic <-> OpenAI)
+└── agent_config/          # Claude Code settings sync CLI
+    ├── cli.py             # Entry point for agent-config-apply
+    ├── adapters.py        # Config format adapters
+    └── engine.py          # Sync logic
+sitecustomize.py           # Auto-loaded on PYTHONPATH (repo root)
 ```
 
 ### Extension Priority Order
@@ -106,22 +118,39 @@ Two YAML files control behavior:
 - `config/litellm.yaml` - Model definitions and provider settings
 - `config/extensions.yaml` - Extension enable/disable and settings
 
+### Policy Configuration (extensions.yaml)
+
+```yaml
+policy:
+  overflow_policy: "reduce_then_trim"  # How to handle context overflow
+  safety_buffer_tokens: 4096
+  min_tail_messages: 8
+  max_trim_steps: 400
+  compact_routing:            # Route /compact commands to cheaper model
+    enabled: true
+    mode: explicit
+    target_model: kimi-k2.5-ali
+  model_limits:               # Per-model token limits
+    '*':
+      max_output: 20000
+      max_context: 180000
+    deepseek-chat:
+      max_output: 8192
+  tool_sanitizer:             # Handle malformed tool definitions
+    enabled: true
+    on_invalid: convert_to_text
+  autocompact_tuning:         # Adjust usage reporting for autocompact
+    enabled: true
+    multipliers:
+      deepseek-chat: 1.2
+```
+
 Extension settings pattern:
 ```yaml
 extensions:
   hard_caps:
     enabled: true
     debug: false
-policy:
-  overflow_policy: "reduce_then_trim"
-  safety_buffer_tokens: 4096
-  model_limits:
-    '*':
-      max_output: 20000
-      max_context: 180000
-    deepseek-chat:
-      max_output: 8192
-      max_context: 131072
 ```
 
 Environment overrides: `LITELLM_EXT_<EXTENSION_NAME>` enables/disables extensions.
@@ -173,3 +202,16 @@ DeepSeek, Zhipu/GLM (glm-4.7, glm-5), Moonshot/Kimi (kimi-k2.5), ByteDance/Douba
 - Silent failures for expected missing modules during bootstrap
 - When adding new extensions, update `extensions/__init__.py` with priority
 - The `agent-config-apply` CLI syncs Claude Code settings to LiteLLM config on startup
+
+### Debugging Extensions
+
+Enable debug output per extension in `config/extensions.yaml`:
+```yaml
+debug:
+  hard_caps: true
+  streaming_sse: true
+```
+
+Or via environment: `LITELLM_EXT_HARD_CAPS_DEBUG=1`
+
+Skip all patches: `LITELLM_EXT_SKIP_AUTO_PATCH=1`
